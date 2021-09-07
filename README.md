@@ -13,4 +13,4 @@ RD_BOT_PASSWORD='your bot's password'
 ```
 
 ## Commands
-TODO
+`!news`: get the top 10 hot posts from r/news and display them as embedded hyperlinks.
