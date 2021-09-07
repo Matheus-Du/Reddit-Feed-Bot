@@ -6,10 +6,10 @@ To run this script, you will need a .env file in the main directory that contain
 
 You'll also need to get OAuth2 permissions for a reddit script bot as well in order for the bot to gather posts from reddit. Within the .env, enter:
 `
-RD_BOT_CLIENT_ID='your bot's client ID'
-RD_BOT_CLIENT_SECRET='your bot's secret ID'
-RD_BOT_USERNAME='your bot's username'
-RD_BOT_PASSWORD='your bot's password'
+RD_BOT_CLIENT_ID='your bot's client ID'\n
+RD_BOT_CLIENT_SECRET='your bot's secret ID'\n
+RD_BOT_USERNAME='your bot's username'\n
+RD_BOT_PASSWORD='your bot's password'\n
 `
 
 ## Commands
