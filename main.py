@@ -1,4 +1,4 @@
-# import praw
+import praw
 import discord
 import os
 from dotenv import load_dotenv
