@@ -1,5 +1,7 @@
+from asyncpraw.const import MAX_IMAGE_SIZE
+from discord import channel
 from discord.utils import get
-import praw
+import asyncpraw
 import discord
 import os
 from dotenv import load_dotenv
@@ -23,19 +25,38 @@ async def on_message(message):
 
     if message.content.startswith('!news'):
         # if the user input matches the command, print the top 10 posts from r/news
-        # TODO: need to use asyncpraw for this part
         reddit = get_reddit()
-        subreddit = reddit.subreddit('news')
-        posts = get_hot_posts(subreddit)
+        subreddit = await reddit.subreddit('news', fetch=True)
+        posts = []
+        async for submission in subreddit.hot(limit=MAX_POSTS):
+            posts.append(Post(submission.title, submission.permalink, submission.selftext, submission.url, submission.score))
 
         embedVar = discord.Embed(title="Here are the current hottest news posts:")
         for post in posts:
             embedVar.add_field(name="\u200b", value="[{}]({})".format(post.title, post.url))
         await message.channel.send(embed=embedVar)
+    
+    if message.content.startswith("!get"):
+        # if the user input matches the command to get a subreddit, get the name of the subreddit and then get posts
+        reddit = get_reddit()
+        try:
+            subreddit = await reddit.subreddit(message.content[5:], fetch=True)
+        except Exception:
+            await message.channel.send("Sorry, this subreddit doesn't exist ):")
+            return
+        # TODO: this needs to be generalized since getting posts is always the same no matter the subreddit
+        posts = []
+        async for submission in subreddit.hot(limit=MAX_POSTS):
+            posts.append(Post(submission.title, submission.permalink, submission.selftext, submission.url, submission.score))
+        
+        embedVar = discord.Embed(title="Here are the current hotttest {} posts:".format(message.content[5:]))
+        for post in posts:
+            embedVar.add_field(name="\u200b", value="[{}](https://reddit.com{})".format(post.title, post.permalink))
+        await message.channel.send(embed=embedVar)
 
 def get_reddit():
     # get the credentials of the reddit user & bot
-    reddit = praw.Reddit(
+    reddit = asyncpraw.Reddit(
         user_agent = "comment-gathering script by u/DirkIsTheGOAT41",
         username = os.getenv('RD_BOT_USERNAME'),
         password = os.getenv('RD_BOT_PASSWORD'),
@@ -43,17 +64,6 @@ def get_reddit():
         client_secret = os.getenv('RD_BOT_CLIENT_SECRET'),
     )
     return reddit
-
-def get_hot_posts(subreddit):
-    # get the top x posts from a given subreddit (set to 20 by default)
-    posts = []
-    i = 0
-    for submission in subreddit.hot(limit=MAX_POSTS):
-        # traverse through the top x posts in r/news, store them in an instance of Post, & display basic info on each
-        posts.append(Post(submission.title, submission.permalink, submission.selftext, submission.url, submission.score))
-        i += 1
-    
-    return posts
 
 class Post:
     # Post class creates an instance of a post on the subreddit along with some important info (i.e. subtext)
