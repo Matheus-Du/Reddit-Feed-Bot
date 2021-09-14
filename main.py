@@ -20,6 +20,8 @@ async def on_ready():
 @client.event
 async def on_message(message):
     # when a user inputs the "!news" command, output the top 10 news posts and a link to their articles
+    posts = []
+
     if message.author == client.user:
         return
 
@@ -27,7 +29,6 @@ async def on_message(message):
         # if the user input matches the command, print the top 10 posts from r/news
         reddit = get_reddit()
         subreddit = await reddit.subreddit('news', fetch=True)
-        posts = []
         async for submission in subreddit.hot(limit=MAX_POSTS):
             posts.append(Post(submission.title, submission.permalink, submission.selftext, submission.url, submission.score))
 
@@ -45,7 +46,6 @@ async def on_message(message):
             await message.channel.send("Sorry, this subreddit doesn't exist ):")
             return
         # TODO: this needs to be generalized since getting posts is always the same no matter the subreddit
-        posts = []
         async for submission in subreddit.hot(limit=MAX_POSTS):
             posts.append(Post(submission.title, submission.permalink, submission.selftext, submission.url, submission.score))
         
